@@ -10,18 +10,22 @@ function Square(props: { value: string; onClick: () => void }) {
   );
 }
 
-class Board extends React.Component<any, { squares: string[] }> {
+class Board extends React.Component<
+  any,
+  { squares: string[]; xIsNext: boolean }
+> {
   constructor(props: any) {
     super(props);
     this.state = {
       squares: Array(9).fill(null),
+      xIsNext: true,
     };
   }
 
   handleClick(i: number) {
     const squares = this.state.squares.slice();
-    squares[i] = "X";
-    this.setState({ squares });
+    squares[i] = this.state.xIsNext ? "X" : "O";
+    this.setState({ squares, xIsNext: !this.state.xIsNext });
   }
 
   renderSquare(i: number) {
@@ -34,7 +38,7 @@ class Board extends React.Component<any, { squares: string[] }> {
   }
 
   render() {
-    const status = "Next player: X";
+    const status = "Next player: " + (this.state.xIsNext ? "X" : "O");
 
     return (
       <div>
