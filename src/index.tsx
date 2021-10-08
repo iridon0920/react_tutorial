@@ -46,22 +46,16 @@ class Board extends React.Component<{
   }
 }
 
-class Game extends React.Component<
-  unknown,
-  { history: { squares: string[] }[]; stepNumber: number; xIsNext: boolean }
-> {
-  constructor(props: unknown) {
-    super(props);
-    this.state = {
-      history: [
-        {
-          squares: Array(9).fill(null),
-        },
-      ],
-      stepNumber: 0,
-      xIsNext: true,
-    };
-  }
+class Game extends React.Component {
+  state = {
+    history: [
+      {
+        squares: Array(9).fill(null),
+      },
+    ],
+    stepNumber: 0,
+    xIsNext: true,
+  };
 
   private createStatusText(squares: string[]) {
     const winner = calculateWinner(squares);
