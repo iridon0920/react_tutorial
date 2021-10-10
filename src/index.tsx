@@ -46,16 +46,27 @@ class Board extends React.Component<{
   }
 }
 
-class Game extends React.Component {
-  state = {
-    history: [
-      {
-        squares: Array(9).fill(null),
-      },
-    ],
-    stepNumber: 0,
-    xIsNext: true,
-  };
+class Game extends React.Component<
+  unknown,
+  {
+    history: { squares: string[]; position: { col?: number; row?: number } }[];
+    stepNumber: number;
+    xIsNext: boolean;
+  }
+> {
+  constructor(props: unknown) {
+    super(props);
+    this.state = {
+      history: [
+        {
+          squares: Array(9).fill(null),
+          position: { col: undefined, row: undefined },
+        },
+      ],
+      stepNumber: 0,
+      xIsNext: true,
+    };
+  }
 
   private createStatusText(squares: string[]) {
     const winner = calculateWinner(squares);
@@ -75,8 +86,12 @@ class Game extends React.Component {
     }
 
     squares[i] = this.state.xIsNext ? "X" : "O";
+    const position = {
+      col: i  % 3 + 1,
+      row:Math.ceil((i + 1) / 3) ,
+    };
     this.setState({
-      history: history.concat([{ squares }]),
+      history: history.concat([{ squares, position }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
@@ -99,6 +114,7 @@ class Game extends React.Component {
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          col:{step.position.col}, row:{step.position.row}
         </li>
       );
     });
