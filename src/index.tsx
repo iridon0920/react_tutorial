@@ -114,9 +114,16 @@ class Game extends React.Component<
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
-          {move !== 0 && (
+          {move !== 0 && move !== history.length - 1 && (
             <span>
               col:{step.position.col}, row:{step.position.row}
+            </span>
+          )}
+          {move !== 0 && move === history.length - 1 && (
+            <span>
+              <b>
+                col:{step.position.col}, row:{step.position.row}
+              </b>
             </span>
           )}
         </li>
