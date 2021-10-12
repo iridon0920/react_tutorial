@@ -13,6 +13,7 @@ function Square(props: { value: string; onClick: () => void }) {
 class Board extends React.Component<{
   squares: string[];
   onClick: (i: number) => void;
+  size: { col: number; row: number };
 }> {
   renderSquare(i: number) {
     return (
@@ -26,21 +27,19 @@ class Board extends React.Component<{
   render() {
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {Array(this.props.size.row)
+          .fill(null)
+          .map((_, rowKey) => {
+            return (
+              <div key={rowKey} className="board-row">
+                {Array(this.props.size.col)
+                  .fill(null)
+                  .map((_, colKey) => {
+                    return this.renderSquare(rowKey * 3 + colKey);
+                  })}
+              </div>
+            );
+          })}
       </div>
     );
   }
@@ -135,6 +134,7 @@ class Game extends React.Component<
           <Board
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
+            size={{ row: 3, col: 3 }}
           />
         </div>
         <div className="game-info">
