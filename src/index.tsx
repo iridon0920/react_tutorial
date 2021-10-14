@@ -51,6 +51,7 @@ class Game extends React.Component<
     history: { squares: string[]; position: { col?: number; row?: number } }[];
     stepNumber: number;
     xIsNext: boolean;
+    ascOrder: boolean;
   }
 > {
   constructor(props: unknown) {
@@ -64,6 +65,7 @@ class Game extends React.Component<
       ],
       stepNumber: 0,
       xIsNext: true,
+      ascOrder: true,
     };
   }
 
@@ -103,6 +105,12 @@ class Game extends React.Component<
     });
   }
 
+  private sortChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const ascOrder = e.target.value === "asc";
+    console.log(ascOrder)
+    this.setState({ ascOrder: ascOrder });
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -140,6 +148,26 @@ class Game extends React.Component<
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
+          <div>
+            <label>
+              <input
+                type="radio"
+                value="asc"
+                onChange={e => this.sortChange(e)}
+                checked={this.state.ascOrder}
+              />
+              昇順
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="desc"
+                onChange={e => this.sortChange(e)}
+                checked={!this.state.ascOrder}
+              />
+              降順
+            </label>
+          </div>
         </div>
       </div>
     );
