@@ -48,7 +48,11 @@ class Board extends React.Component<{
 class Game extends React.Component<
   unknown,
   {
-    history: { squares: string[]; position: { col?: number; row?: number } }[];
+    history: {
+      squares: string[];
+      position: { col?: number; row?: number };
+      count: number;
+    }[];
     stepNumber: number;
     xIsNext: boolean;
     ascOrder: boolean;
@@ -61,6 +65,7 @@ class Game extends React.Component<
         {
           squares: Array(9).fill(null),
           position: { col: undefined, row: undefined },
+          count: 0,
         },
       ],
       stepNumber: 0,
@@ -80,8 +85,14 @@ class Game extends React.Component<
 
   handleClick(i: number) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
+    const current = history.find(
+      (step) => step.count === this.state.stepNumber
+    );
+    if (!current) {
+      return;
+    }
     const squares = current.squares.slice();
+    const stepNumber = history.length;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -92,8 +103,8 @@ class Game extends React.Component<
       row: Math.ceil((i + 1) / 3),
     };
     this.setState({
-      history: history.concat([{ squares, position }]),
-      stepNumber: history.length,
+      history: history.concat([{ squares, position, count: stepNumber }]),
+      stepNumber,
       xIsNext: !this.state.xIsNext,
     });
   }
@@ -107,26 +118,41 @@ class Game extends React.Component<
 
   private sortChange(e: React.ChangeEvent<HTMLInputElement>) {
     const ascOrder = e.target.value === "asc";
-    console.log(ascOrder)
     this.setState({ ascOrder: ascOrder });
   }
 
   render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
+    const history = this.state.history
+      .slice(0, this.state.stepNumber + 1)
+      .sort((a, b) => {
+        if (this.state.ascOrder) {
+          return a.count - b.count;
+        } else {
+          return (a.count - b.count) * -1;
+        }
+      });
+    const current = history.find(
+      (step) => step.count === this.state.stepNumber
+    );
+    if (!current) {
+      return;
+    }
+
     const status = this.createStatusText(current.squares);
 
     const moves = history.map((step, move) => {
-      const desc = move ? "Go to move #" + move : "Go to game start";
+      const desc = step.count
+        ? "Go to move #" + step.count
+        : "Go to game start";
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
-          {move !== 0 && move !== history.length - 1 && (
+          {step.count !== 0 && step.count !== history.length - 1 && (
             <span>
               col:{step.position.col}, row:{step.position.row}
             </span>
           )}
-          {move !== 0 && move === history.length - 1 && (
+          {step.count !== 0 && step.count === history.length - 1 && (
             <span>
               <b>
                 col:{step.position.col}, row:{step.position.row}
@@ -153,19 +179,19 @@ class Game extends React.Component<
               <input
                 type="radio"
                 value="asc"
-                onChange={e => this.sortChange(e)}
+                onChange={(e) => this.sortChange(e)}
                 checked={this.state.ascOrder}
               />
-              昇順
+              asc
             </label>
             <label>
               <input
                 type="radio"
                 value="desc"
-                onChange={e => this.sortChange(e)}
+                onChange={(e) => this.sortChange(e)}
                 checked={!this.state.ascOrder}
               />
-              降順
+              desc
             </label>
           </div>
         </div>
