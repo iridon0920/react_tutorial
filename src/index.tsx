@@ -182,7 +182,7 @@ class Game extends React.Component<
                 onChange={(e) => this.sortChange(e)}
                 checked={this.state.ascOrder}
               />
-              asc
+              昇順
             </label>
             <label>
               <input
@@ -191,7 +191,7 @@ class Game extends React.Component<
                 onChange={(e) => this.sortChange(e)}
                 checked={!this.state.ascOrder}
               />
-              desc
+              降順
             </label>
           </div>
         </div>
