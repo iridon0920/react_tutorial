@@ -179,6 +179,7 @@ class Game extends React.Component<
               </b>
             </span>
           )}
+          {step.count === 9 && <span>引き分け</span>}
         </li>
       );
     });
