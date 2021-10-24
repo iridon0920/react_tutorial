@@ -2,6 +2,18 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+type GameState = {
+  history: {
+    squares: string[];
+    position: { col?: number; row?: number };
+    count: number;
+  }[];
+  gameStatus: { winner: string; linePositions: number[] } | null;
+  stepNumber: number;
+  xIsNext: boolean;
+  ascOrder: boolean;
+};
+
 function Square(props: {
   value: string;
   isWinnerPosition: boolean;
@@ -58,20 +70,7 @@ class Board extends React.Component<{
   }
 }
 
-class Game extends React.Component<
-  unknown,
-  {
-    history: {
-      squares: string[];
-      position: { col?: number; row?: number };
-      count: number;
-    }[];
-    gameStatus: { winner: string; linePositions: number[] } | null;
-    stepNumber: number;
-    xIsNext: boolean;
-    ascOrder: boolean;
-  }
-> {
+class Game extends React.Component<unknown, GameState> {
   constructor(props: unknown) {
     super(props);
     this.state = {
