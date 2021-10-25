@@ -2,13 +2,36 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+type SquaresType = (string|null)[];
+
+const calculateWinner = (squares: SquaresType) => {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return { winner: squares[a], linePositions: [a, b, c] };
+    }
+  }
+  return null;
+};
+
 type GameState = {
   history: {
     squares: string[];
     position: { col?: number; row?: number };
     count: number;
   }[];
-  gameStatus: { winner: string; linePositions: number[] } | null;
+  gameStatus: { winner: string | null; linePositions: number[] } | null;
   stepNumber: number;
   xIsNext: boolean;
   ascOrder: boolean;
@@ -221,26 +244,6 @@ class Game extends React.Component<unknown, GameState> {
   }
 }
 
-function calculateWinner(squares: string[]) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return { winner: squares[a], linePositions: [a, b, c] };
-    }
-  }
-  return null;
-}
 // ========================================
 
 ReactDOM.render(<Game />, document.getElementById("root"));
