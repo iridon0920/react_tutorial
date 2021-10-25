@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-type SquaresType = (string|null)[];
+type SquaresType = (string | null)[];
 
 const calculateWinner = (squares: SquaresType) => {
   const lines = [
@@ -37,11 +37,13 @@ type GameState = {
   ascOrder: boolean;
 };
 
-function Square(props: {
-  value: string;
+interface SquareProps {
+  value: string | null;
   isWinnerPosition: boolean;
   onClick: () => void;
-}) {
+}
+
+const Square: React.VFC<SquareProps> = (props) => {
   return (
     <button
       className={props.isWinnerPosition ? "winnerSquare" : "square"}
@@ -50,7 +52,7 @@ function Square(props: {
       {props.value}
     </button>
   );
-}
+};
 
 class Board extends React.Component<{
   squares: string[];
