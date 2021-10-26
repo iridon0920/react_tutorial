@@ -54,46 +54,44 @@ const Square: React.VFC<SquareProps> = (props) => {
   );
 };
 
-class Board extends React.Component<{
-  squares: string[];
+interface BoardProps {
+  squares: SquaresType;
   onClick: (i: number) => void;
   size: { col: number; row: number };
   winnerPositions: number[] | null;
-}> {
-  renderSquare(i: number) {
+}
+
+const Board: React.VFC<BoardProps> = (props) => {
+  const renderSquare = (i: number) => {
     return (
       <Square
-        value={this.props.squares[i]}
+        value={props.squares[i]}
         isWinnerPosition={
-          this.props.winnerPositions
-            ? this.props.winnerPositions.includes(i)
-            : false
+          props.winnerPositions ? props.winnerPositions.includes(i) : false
         }
-        onClick={() => this.props.onClick(i)}
+        onClick={() => props.onClick(i)}
       />
     );
-  }
+  };
 
-  render() {
-    return (
-      <div>
-        {Array(this.props.size.row)
-          .fill(null)
-          .map((_, rowKey) => {
-            return (
-              <div key={rowKey} className="board-row">
-                {Array(this.props.size.col)
-                  .fill(null)
-                  .map((_, colKey) => {
-                    return this.renderSquare(rowKey * 3 + colKey);
-                  })}
-              </div>
-            );
-          })}
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      {Array(props.size.row)
+        .fill(null)
+        .map((_, rowKey) => {
+          return (
+            <div key={rowKey} className="board-row">
+              {Array(props.size.col)
+                .fill(null)
+                .map((_, colKey) => {
+                  return renderSquare(rowKey * 3 + colKey);
+                })}
+            </div>
+          );
+        })}
+    </div>
+  );
+};
 
 class Game extends React.Component<unknown, GameState> {
   constructor(props: unknown) {
