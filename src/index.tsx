@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
@@ -23,18 +23,6 @@ const calculateWinner = (squares: SquaresType) => {
     }
   }
   return null;
-};
-
-type GameState = {
-  history: {
-    squares: string[];
-    position: { col?: number; row?: number };
-    count: number;
-  }[];
-  gameStatus: { winner: string | null; linePositions: number[] } | null;
-  stepNumber: number;
-  xIsNext: boolean;
-  ascOrder: boolean;
 };
 
 interface SquareProps {
@@ -93,156 +81,146 @@ const Board: React.VFC<BoardProps> = (props) => {
   );
 };
 
-class Game extends React.Component<unknown, GameState> {
-  constructor(props: unknown) {
-    super(props);
-    this.state = {
-      history: [
-        {
-          squares: Array(9).fill(null),
-          position: { col: undefined, row: undefined },
-          count: 0,
-        },
-      ],
-      gameStatus: null,
-      stepNumber: 0,
-      xIsNext: true,
-      ascOrder: true,
-    };
-  }
+interface History {
+  squares: SquaresType;
+  position: { col?: number; row?: number };
+  count: number;
+}
 
-  private createStatusText() {
-    if (this.state.gameStatus) {
-      return "Winner: " + this.state.gameStatus.winner;
+interface GameStatus {
+  winner: string | null;
+  linePositions: number[];
+}
+
+const Game: React.VFC = () => {
+  const [stepNumber, setStepNumber] = useState(0);
+  const [xIsNext, setXIsNext] = useState(true);
+  const [history, setHistory] = useState<History[]>([
+    {
+      squares: Array(9).fill(null),
+      position: { col: undefined, row: undefined },
+      count: 0,
+    },
+  ]);
+  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
+  const [ascOrder, setAscOrder] = useState(true);
+
+  const createStatusText = () => {
+    if (gameStatus) {
+      return `Winner: ${gameStatus.winner}`;
     } else {
-      return "Next player: " + (this.state.xIsNext ? "X" : "O");
+      return `Next player: ${xIsNext ? "X" : "O"}`;
     }
-  }
+  };
 
-  handleClick(i: number) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history.find(
-      (step) => step.count === this.state.stepNumber
-    );
+  const handleClick = (i: number) => {
+    const historyCurrent = history.slice(0, stepNumber + 1);
+    const current = historyCurrent.find((step) => step.count === stepNumber);
     if (!current) {
       return;
     }
     const squares = current.squares.slice();
-    const stepNumber = history.length;
-    if (this.state.gameStatus || squares[i]) {
+    if (gameStatus || squares[i]) {
       return;
     }
 
-    squares[i] = this.state.xIsNext ? "X" : "O";
+    squares[i] = xIsNext ? "X" : "O";
     const position = {
       col: (i % 3) + 1,
       row: Math.ceil((i + 1) / 3),
     };
-    this.setState({
-      history: history.concat([{ squares, position, count: stepNumber }]),
-      stepNumber,
-      gameStatus: calculateWinner(squares),
-      xIsNext: !this.state.xIsNext,
-    });
-  }
 
-  private jumpTo(step: number) {
-    this.setState({
-      stepNumber: step,
-      xIsNext: step % 2 === 0,
-      gameStatus: null,
-    });
-  }
-
-  private sortChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const ascOrder = e.target.value === "asc";
-    this.setState({ ascOrder: ascOrder });
-  }
-
-  render() {
-    const history = this.state.history
-      .slice(0, this.state.stepNumber + 1)
-      .sort((a, b) => {
-        if (this.state.ascOrder) {
-          return a.count - b.count;
-        } else {
-          return (a.count - b.count) * -1;
-        }
-      });
-    const current = history.find(
-      (step) => step.count === this.state.stepNumber
+    setHistory(
+      historyCurrent.concat([{ squares, position, count: stepNumber }])
     );
-    if (!current) {
-      return;
+    setStepNumber(historyCurrent.length);
+    setGameStatus(calculateWinner(squares));
+    setXIsNext(!xIsNext);
+  };
+
+  const jumpTo = (step: number) => {
+    setStepNumber(step);
+    setXIsNext(step % 2 === 0);
+    setGameStatus(null);
+  };
+
+  const sortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const ascOrder = e.target.value === "asc";
+    setAscOrder(ascOrder);
+  };
+
+  const historyCurrent = history.slice(0, stepNumber + 1).sort((a, b) => {
+    if (ascOrder) {
+      return a.count - b.count;
+    } else {
+      return (a.count - b.count) * -1;
     }
+  });
+  const current = historyCurrent.find((step) => step.count === stepNumber);
 
-    const status = this.createStatusText();
+  const status = createStatusText();
 
-    const winnerPosition = this.state.gameStatus
-      ? this.state.gameStatus.linePositions
-      : null;
+  const winnerPosition = gameStatus ? gameStatus.linePositions : null;
 
-    const moves = history.map((step, move) => {
-      const desc = step.count
-        ? "Go to move #" + step.count
-        : "Go to game start";
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-          {step.count !== 0 && step.count !== history.length - 1 && (
-            <span>
-              col:{step.position.col}, row:{step.position.row}
-            </span>
-          )}
-          {step.count !== 0 && step.count === history.length - 1 && (
-            <span>
-              <b>
-                col:{step.position.col}, row:{step.position.row}
-              </b>
-            </span>
-          )}
-          {step.count === 9 && <span>引き分け</span>}
-        </li>
-      );
-    });
+  const moves = history.map((step, move) => {
+    const desc = step.count ? `Go to move #${step.count}` : "Go to game start";
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            squares={current.squares}
-            winnerPositions={winnerPosition}
-            onClick={(i) => this.handleClick(i)}
-            size={{ row: 3, col: 3 }}
-          />
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
-          <div>
-            <label>
-              <input
-                type="radio"
-                value="asc"
-                onChange={(e) => this.sortChange(e)}
-                checked={this.state.ascOrder}
-              />
-              昇順
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="desc"
-                onChange={(e) => this.sortChange(e)}
-                checked={!this.state.ascOrder}
-              />
-              降順
-            </label>
-          </div>
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+        {step.count !== 0 && step.count !== history.length - 1 && (
+          <span>
+            col:{step.position.col}, row:{step.position.row}
+          </span>
+        )}
+        {step.count !== 0 && step.count === history.length - 1 && (
+          <span>
+            <b>
+              col:{step.position.col}, row:{step.position.row}
+            </b>
+          </span>
+        )}
+        {step.count === 9 && <span>引き分け</span>}
+      </li>
+    );
+  });
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board
+          squares={current ? current.squares : [null]}
+          winnerPositions={winnerPosition}
+          onClick={(i) => handleClick(i)}
+          size={{ row: 3, col: 3 }}
+        />
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <ol>{moves}</ol>
+        <div>
+          <label>
+            <input
+              type="radio"
+              value="asc"
+              onChange={(e) => sortChange(e)}
+              checked={ascOrder}
+            />
+            昇順
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="desc"
+              onChange={(e) => sortChange(e)}
+              checked={!ascOrder}
+            />
+            降順
+          </label>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 // ========================================
 
