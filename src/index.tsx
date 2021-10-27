@@ -120,6 +120,7 @@ const Game: React.VFC = () => {
       return;
     }
     const squares = current.squares.slice();
+    const stepNumberCurrent = historyCurrent.length;
     if (gameStatus || squares[i]) {
       return;
     }
@@ -131,9 +132,9 @@ const Game: React.VFC = () => {
     };
 
     setHistory(
-      historyCurrent.concat([{ squares, position, count: stepNumber }])
+      historyCurrent.concat([{ squares, position, count: stepNumberCurrent }])
     );
-    setStepNumber(historyCurrent.length);
+    setStepNumber(stepNumberCurrent);
     setGameStatus(calculateWinner(squares));
     setXIsNext(!xIsNext);
   };
