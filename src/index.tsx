@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
@@ -92,78 +92,125 @@ interface GameStatus {
   linePositions: number[];
 }
 
-const Game: React.VFC = () => {
-  const [stepNumber, setStepNumber] = useState(0);
-  const [xIsNext, setXIsNext] = useState(true);
-  const [history, setHistory] = useState<History[]>([
+interface State {
+  history: History[];
+  stepNumber: number;
+  xIsNext: boolean;
+  gameStatus: GameStatus | null;
+  ascOrder: boolean;
+}
+
+const initialState: State = {
+  history: [
     {
       squares: Array(9).fill(null),
       position: { col: undefined, row: undefined },
       count: 0,
     },
-  ]);
-  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
-  const [ascOrder, setAscOrder] = useState(true);
+  ],
+  stepNumber: 0,
+  xIsNext: true,
+  gameStatus: null,
+  ascOrder: true,
+};
+
+type Action =
+  | { type: "click"; value: number }
+  | { type: "jump"; value: number }
+  | { type: "sort"; value: React.ChangeEvent<HTMLInputElement> };
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "click": {
+      const historyCurrent = state.history.slice(0, state.stepNumber + 1);
+      const current = historyCurrent.find(
+        (step) => step.count === state.stepNumber
+      );
+      if (!current) {
+        return state;
+      }
+      const squares = current.squares.slice();
+      const stepNumberCurrent = historyCurrent.length;
+      if (state.gameStatus || squares[action.value]) {
+        return state;
+      }
+
+      squares[action.value] = state.xIsNext ? "X" : "O";
+      const position = {
+        col: (action.value % 3) + 1,
+        row: Math.ceil((action.value + 1) / 3),
+      };
+
+      return {
+        ...state,
+        history: historyCurrent.concat([
+          { squares, position, count: stepNumberCurrent },
+        ]),
+        stepNumber: stepNumberCurrent,
+        gameStatus: calculateWinner(squares),
+        xIsNext: !state.xIsNext,
+      };
+    }
+    case "jump": {
+      return {
+        ...state,
+        stepNumber: action.value,
+        xIsNext: action.value % 2 === 0,
+        gameStatus: null,
+      };
+    }
+    case "sort": {
+      return {
+        ...state,
+        ascOrder: action.value.target.value === "asc",
+      };
+    }
+  }
+};
+
+const Game: React.VFC = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const createStatusText = () => {
-    if (gameStatus) {
-      return `Winner: ${gameStatus.winner}`;
+    if (state.gameStatus) {
+      return `Winner: ${state.gameStatus.winner}`;
     } else {
-      return `Next player: ${xIsNext ? "X" : "O"}`;
+      return `Next player: ${state.xIsNext ? "X" : "O"}`;
     }
   };
 
   const handleClick = (i: number) => {
-    const historyCurrent = history.slice(0, stepNumber + 1);
-    const current = historyCurrent.find((step) => step.count === stepNumber);
-    if (!current) {
-      return;
-    }
-    const squares = current.squares.slice();
-    const stepNumberCurrent = historyCurrent.length;
-    if (gameStatus || squares[i]) {
-      return;
-    }
-
-    squares[i] = xIsNext ? "X" : "O";
-    const position = {
-      col: (i % 3) + 1,
-      row: Math.ceil((i + 1) / 3),
-    };
-
-    setHistory(
-      historyCurrent.concat([{ squares, position, count: stepNumberCurrent }])
-    );
-    setStepNumber(stepNumberCurrent);
-    setGameStatus(calculateWinner(squares));
-    setXIsNext(!xIsNext);
+    dispatch({ type: "click", value: i });
   };
 
   const jumpTo = (step: number) => {
-    setStepNumber(step);
-    setXIsNext(step % 2 === 0);
-    setGameStatus(null);
+    dispatch({ type: "jump", value: step });
   };
 
   const sortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const ascOrder = e.target.value === "asc";
-    setAscOrder(ascOrder);
+    dispatch({ type: "sort", value: e });
   };
 
-  const historyCurrent = history.slice(0, stepNumber + 1).sort((a, b) => {
-    if (ascOrder) {
-      return a.count - b.count;
-    } else {
-      return (a.count - b.count) * -1;
-    }
-  });
-  const current = historyCurrent.find((step) => step.count === stepNumber);
+  const historyCurrent = state.history
+    .slice(0, state.stepNumber + 1)
+    .sort((a, b) => {
+      if (state.ascOrder) {
+        return a.count - b.count;
+      } else {
+        return (a.count - b.count) * -1;
+      }
+    });
+  const current = historyCurrent.find(
+    (step) => step.count === state.stepNumber
+  );
 
   const status = createStatusText();
 
-  const winnerPosition = gameStatus ? gameStatus.linePositions : null;
+  const winnerPosition = state.gameStatus
+    ? state.gameStatus.linePositions
+    : null;
 
-  const moves = history.map((step, move) => {
+  const moves = historyCurrent.map((step, move) => {
     const desc = step.count ? `Go to move #${step.count}` : "Go to game start";
     return (
       <li key={move}>
@@ -204,7 +251,7 @@ const Game: React.VFC = () => {
               type="radio"
               value="asc"
               onChange={(e) => sortChange(e)}
-              checked={ascOrder}
+              checked={state.ascOrder}
             />
             昇順
           </label>
@@ -213,7 +260,7 @@ const Game: React.VFC = () => {
               type="radio"
               value="desc"
               onChange={(e) => sortChange(e)}
-              checked={!ascOrder}
+              checked={!state.ascOrder}
             />
             降順
           </label>
