@@ -229,7 +229,7 @@ const Game: React.VFC = () => {
             </b>
           </span>
         )}
-        {step.count === 9 && <span>引き分け</span>}
+        {step.count === 9 && !state.gameStatus && <span>引き分け</span>}
       </li>
     );
   });
