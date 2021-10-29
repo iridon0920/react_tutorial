@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, memo } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
@@ -31,7 +31,7 @@ interface SquareProps {
   onClick: () => void;
 }
 
-const Square: React.VFC<SquareProps> = (props) => {
+const Square: React.VFC<SquareProps> = memo((props) => {
   return (
     <button
       className={props.isWinnerPosition ? "winnerSquare" : "square"}
@@ -40,7 +40,8 @@ const Square: React.VFC<SquareProps> = (props) => {
       {props.value}
     </button>
   );
-};
+});
+Square.displayName = "Square";
 
 interface BoardProps {
   squares: SquaresType;
@@ -49,7 +50,7 @@ interface BoardProps {
   winnerPositions: number[] | null;
 }
 
-const Board: React.VFC<BoardProps> = (props) => {
+const Board: React.VFC<BoardProps> = memo((props) => {
   const renderSquare = (i: number) => {
     return (
       <Square
@@ -79,7 +80,8 @@ const Board: React.VFC<BoardProps> = (props) => {
         })}
     </div>
   );
-};
+});
+Board.displayName = "Board";
 
 interface History {
   squares: SquaresType;
