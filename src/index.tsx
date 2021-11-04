@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { TopPage } from "./page/top-page";
-import { GamePage } from "./page/game-page";
+import { TopPage } from "./top/page/top-page";
+import { GamePage } from "./game/page/game-page";
 
 const App = () => {
   return (

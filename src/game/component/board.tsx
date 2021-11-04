@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import { Square } from "./square";
-
-export type SquaresType = (string | null)[];
+import { SquaresType } from "../type/squares-type";
 
 interface BoardProps {
   squares: SquaresType;

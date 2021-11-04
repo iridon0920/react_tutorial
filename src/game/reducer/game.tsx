@@ -1,5 +1,5 @@
 import React from "react";
-import { SquaresType } from "../component/board";
+import {SquaresType} from "../type/squares-type";
 
 const calculateWinner = (squares: SquaresType) => {
   const lines = [
