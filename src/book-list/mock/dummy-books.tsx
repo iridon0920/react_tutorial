@@ -1,6 +1,6 @@
 import { BookToRead } from "../type/board-to-read";
 
-const dummyBooks: BookToRead[] = [
+export const dummyBooks: BookToRead[] = [
   {
     id: 1,
     title: "はじめてのReact",
