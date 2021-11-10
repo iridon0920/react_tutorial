@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import "./book-list.css";
 import { dummyBooks } from "../mock/dummy-books";
 import { BookRow } from "../component/book-row";
 
+const [books, setBooks] = useState(dummyBooks);
+
 export const BookListPage: React.VFC = () => {
-  const bookRows = dummyBooks.map((book) => {
+  const bookRows = books.map((book) => {
     return (
       <BookRow
         book={book}
         key={book.id}
-        onMemoChange={(id) => {}}
-        onDelete={(id) => {}}
+        onMemoChange={(id) => {
+          console.log(id + " memoChange");
+        }}
+        onDelete={(id) => {
+          console.log(id + " onDelete");
+        }}
       />
     );
   });

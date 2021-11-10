@@ -1,7 +1,7 @@
 import { BookRowProps } from "../type/book-row-props";
 import React from "react";
 
-export const BookRow = (props: BookRowProps) => {
+export const BookRow = (props: BookRowProps): JSX.Element => {
   const { title, authors, memo } = props.book;
 
   const handleMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {

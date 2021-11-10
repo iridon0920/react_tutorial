@@ -5,10 +5,10 @@ export const TopPage: React.VFC = () => {
   return (
     <div>
       <p>
-        <Link to="/game">OXゲーム</Link>)
+        <Link to="/game">OXゲーム</Link>
       </p>
       <p>
-        <Link to="/book-list">書籍情報</Link>)
+        <Link to="/book-list">書籍情報</Link>
       </p>
     </div>
   );
