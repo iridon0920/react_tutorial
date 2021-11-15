@@ -11,14 +11,22 @@ export const BookListPage: React.VFC = () => {
     setBooks(newBooks);
   };
 
+  const handleBookMemoChange = (id: number, memo: string) => {
+    const newBooks = books.map((book) => {
+      if (book.id === id) {
+        book.memo = memo;
+      }
+      return book;
+    });
+    setBooks(newBooks);
+  };
+
   const bookRows = books.map((book) => {
     return (
       <BookRow
         book={book}
         key={book.id}
-        onMemoChange={(id) => {
-          console.log(id + " memoChange");
-        }}
+        onMemoChange={(id, memo) => handleBookMemoChange(id, memo)}
         onDelete={(id) => handleBookDelete(id)}
       />
     );
