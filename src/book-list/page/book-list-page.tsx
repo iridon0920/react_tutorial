@@ -3,9 +3,14 @@ import "./book-list.css";
 import { dummyBooks } from "../mock/dummy-books";
 import { BookRow } from "../component/book-row";
 
-const [books, setBooks] = useState(dummyBooks);
-
 export const BookListPage: React.VFC = () => {
+  const [books, setBooks] = useState(dummyBooks);
+
+  const handleBookDelete = (id: number) => {
+    const newBooks = books.filter((book) => book.id !== id);
+    setBooks(newBooks);
+  };
+
   const bookRows = books.map((book) => {
     return (
       <BookRow
@@ -14,9 +19,7 @@ export const BookListPage: React.VFC = () => {
         onMemoChange={(id) => {
           console.log(id + " memoChange");
         }}
-        onDelete={(id) => {
-          console.log(id + " onDelete");
-        }}
+        onDelete={(id) => handleBookDelete(id)}
       />
     );
   });
