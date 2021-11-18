@@ -3,7 +3,7 @@ import "./book-list.css";
 import { dummyBooks } from "../mock/dummy-books";
 import { BookRow } from "../component/book-row";
 
-export const BookListPage: React.VFC = () => {
+export const BookListPage = (): JSX.Element => {
   const [books, setBooks] = useState(dummyBooks);
 
   const handleBookDelete = (id: number) => {
