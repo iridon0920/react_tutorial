@@ -82,6 +82,7 @@ h1 {
   height: 260px;
   text-align: center;
   position: relative;
+  color: white;
 }
 
 .book-search-item h2 {
