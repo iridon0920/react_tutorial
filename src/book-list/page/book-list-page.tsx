@@ -75,8 +75,10 @@ export const BookListPage = (): JSX.Element => {
       >
         <BookSearchDialog
           maxResults={20}
-          onBookAdd={(book) => {}}
-        ></BookSearchDialog>
+          onBookAdd={(book) => {
+            console.log(book);
+          }}
+        />
       </ReactModal>
     </div>
   );
