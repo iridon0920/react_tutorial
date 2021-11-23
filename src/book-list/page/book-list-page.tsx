@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "./book-list.css";
-import { dummyBooks } from "../mock/dummy-books";
 import { BookRow } from "../component/book-row";
 import ReactModal from "react-modal";
 import { BookSearchDialog } from "../component/book-search-dialog";
+import {BookToRead} from "../type/board-to-read";
 
 ReactModal.setAppElement("#root");
 
@@ -23,7 +23,7 @@ const customStyles = {
 };
 
 export const BookListPage = (): JSX.Element => {
-  const [books, setBooks] = useState(dummyBooks);
+  const [books, setBooks] = useState([] as BookToRead[]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const handleBookDelete = (id: number) => {
