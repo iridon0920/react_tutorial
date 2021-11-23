@@ -43,7 +43,7 @@ function extractBooks(json: { items: JsonItem[] }): BookDescription[] {
   });
 }
 
-export const BookSearchDialog = (props: BookSearchDialogProps) => {
+export const BookSearchDialog = (props: BookSearchDialogProps): JSX.Element => {
   const [books, setBooks] = useState([] as BookDescription[]);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");

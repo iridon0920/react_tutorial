@@ -3,7 +3,8 @@ import "./book-list.css";
 import { BookRow } from "../component/book-row";
 import ReactModal from "react-modal";
 import { BookSearchDialog } from "../component/book-search-dialog";
-import {BookToRead} from "../type/board-to-read";
+import { BookToRead } from "../type/board-to-read";
+import { BookDescription } from "../type/book-description";
 
 ReactModal.setAppElement("#root");
 
@@ -49,6 +50,13 @@ export const BookListPage = (): JSX.Element => {
     setModalIsOpen(false);
   };
 
+  const handleBookAdd = (book: BookDescription) => {
+    const newBook: BookToRead = { ...book, id: Date.now(), memo: "" };
+    const newBooks = [...books, newBook];
+    setBooks(newBooks);
+    setModalIsOpen(false);
+  };
+
   const bookRows = books.map((book) => {
     return (
       <BookRow
@@ -76,7 +84,7 @@ export const BookListPage = (): JSX.Element => {
         <BookSearchDialog
           maxResults={20}
           onBookAdd={(book) => {
-            console.log(book);
+            handleBookAdd(book);
           }}
         />
       </ReactModal>
