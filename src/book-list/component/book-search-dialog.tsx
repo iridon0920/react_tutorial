@@ -52,8 +52,8 @@ export const BookSearchDialog = (props: BookSearchDialogProps): JSX.Element => {
   useEffect(() => {
     if (isSearching) {
       const url = buildSearchUrl(
-        titleRef.current!.value,
-        authorRef.current!.value,
+        titleRef.current?.value ?? "",
+        authorRef.current?.value ?? "",
         props.maxResults
       );
       fetch(url)
@@ -74,7 +74,7 @@ export const BookSearchDialog = (props: BookSearchDialogProps): JSX.Element => {
   }, [isSearching]);
 
   const handleSearchClick = () => {
-    if (!titleRef.current!.value && !authorRef.current!.value) {
+    if (!titleRef.current?.value && !authorRef.current?.value) {
       alert("条件を入力してください");
       return;
     }
