@@ -1,77 +1,18 @@
 import { BookSearchDialogProps } from "../type/book-search-dialog-props";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useRef } from "react";
 import { BookDescription } from "../type/book-description";
 import { BookSearchItem } from "./book-search-item";
-
-function buildSearchUrl(
-  title: string,
-  author: string,
-  maxResults: number
-): string {
-  const url = "https://www.googleapis.com/books/v1/volumes?q=";
-  const conditions: string[] = [];
-  if (title) {
-    conditions.push(`in title:${title}`);
-  }
-  if (author) {
-    conditions.push(`in author:${author}`);
-  }
-  return url + conditions.join("+") + `&maxResults=${maxResults}`;
-}
-
-type JsonItem = {
-  volumeInfo: {
-    title: string;
-    authors?: string[];
-    imageLinks?: {
-      smallThumbnail: string;
-    };
-  };
-};
-
-function extractBooks(json: { items: JsonItem[] }): BookDescription[] {
-  const items: JsonItem[] = json.items;
-  return items.map((item) => {
-    const volumeInfo = item.volumeInfo;
-    return {
-      title: volumeInfo.title,
-      authors: volumeInfo.authors ? volumeInfo.authors.join(", ") : "",
-      thumbnail: volumeInfo.imageLinks
-        ? volumeInfo.imageLinks.smallThumbnail
-        : "",
-    };
-  });
-}
+import { useBookData } from "../hooks/use-book-data.";
 
 export const BookSearchDialog = (props: BookSearchDialogProps): JSX.Element => {
-  const [books, setBooks] = useState([] as BookDescription[]);
   const titleRef = useRef<HTMLInputElement>(null);
   const authorRef = useRef<HTMLInputElement>(null);
-  const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    if (isSearching) {
-      const url = buildSearchUrl(
-        titleRef.current?.value ?? "",
-        authorRef.current?.value ?? "",
-        props.maxResults
-      );
-      fetch(url)
-        .then((res) => {
-          return res.json();
-        })
-        .then((json) => {
-          return extractBooks(json);
-        })
-        .then((books) => {
-          setBooks(books);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-    setIsSearching(false);
-  }, [isSearching]);
+  const [books, setIsSearching] = useBookData(
+    titleRef.current?.value ?? "",
+    authorRef.current?.value ?? "",
+    props.maxResults
+  );
 
   const handleSearchClick = () => {
     if (!titleRef.current?.value && !authorRef.current?.value) {
