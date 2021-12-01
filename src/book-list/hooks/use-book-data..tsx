@@ -47,10 +47,9 @@ export const useBookData = (
   maxResults: number
 ) => {
   const [books, setBooks] = useState([] as BookDescription[]);
-  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    if (isSearching) {
+    if (title || author) {
       const url = buildSearchUrl(title, author, maxResults);
       fetch(url)
         .then((res) => {
@@ -66,8 +65,8 @@ export const useBookData = (
           console.error(err);
         });
     }
-    setIsSearching(false);
-  }, [isSearching]);
+    //  title, authorの値が前回から変わったときのみ第一引数の関数実行
+  }, [title, author, maxResults]);
 
-  return [books, setIsSearching] as const;
+  return books;
 };
